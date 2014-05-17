@@ -1,4 +1,4 @@
-set(WARNINGS "-W -Wall -Wextra -Winit-self -Weverything -Wfatal-errors")
+set(WARNINGS "-W -Wall -Werror -Wextra -Winit-self -Weverything -Wfatal-errors")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNINGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS}")
 
