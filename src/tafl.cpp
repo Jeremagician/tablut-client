@@ -26,10 +26,15 @@ int tafl::operator()()
 {
 	window window("Tablut", 800, 600);
 
-	while(true)
+	while(running_)
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
+		SDL_Event e;
+		while(SDL_PollEvent(&e)) {
+			if(e.type == SDL_QUIT)
+				running_ = false;
+		}
 
+		glClear(GL_COLOR_BUFFER_BIT);
 		window.swap();
 	}
 

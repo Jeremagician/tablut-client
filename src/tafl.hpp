@@ -11,6 +11,7 @@ public:
 	int operator()();
 private:
 	SDL sdl{SDL_INIT_EVERYTHING}; // Will init SDL automatically
+	bool running_ = true;
 };
 
 
