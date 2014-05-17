@@ -1,0 +1,32 @@
+tafl-client
+===========
+This is a university project to build game
+with a strong Human-computer interaction (HCI)
+and a reliable game architecture
+with a powerful artificial intelligence.
+
+This is a talf game : http://en.wikipedia.org/wiki/Tafl_games
+You can choose which variant you want to play.
+
+Build
+-----
+To build tafl-client you need a proper version of git.
+
+Init git submodules :
+$ git submodule init # register git submodules in .git/config
+$ git submodule update # clone/fetch and checkout submodules
+
+With CMake, in-source build isn't a proper way to build,
+it's why you should create a "build" directory and build from here:
+
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+
+This will build the tafl-client into the build directory.
+
+Dependencies
+------------
+* OpenGL
+* SDL2
