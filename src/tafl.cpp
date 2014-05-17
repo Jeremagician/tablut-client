@@ -24,7 +24,7 @@ tafl::~tafl()
 
 int tafl::operator()()
 {
-	window window("omg", 800, 600);
+	window window("Tablut", 800, 600);
 
 	while(true)
 	{
