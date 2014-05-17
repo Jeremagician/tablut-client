@@ -1,0 +1,11 @@
+set(COMPILERS_DIR "${CMAKE_SOURCE_DIR}/cmake/compilers")
+
+if(MSVC)
+  include (${COMPILERS_DIR}/msvc.cmake)
+elseif(MINGW)
+  include (${COMPILERS_DIR}/mingw.cmake)
+elseif(CMAKE_C_COMPILER MATCHES "gcc" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+  include (${COMPILERS_DIR}/gcc.cmake)
+elseif(CMAKE_C_COMPILER MATCHES "clang")
+  include (${COMPILERS_DIR}/clang.cmake)
+endif()
