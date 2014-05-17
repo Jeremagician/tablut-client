@@ -1,7 +1,7 @@
 #include <exception>
 #include <iostream>
 #include <SDL.h>
-#include "tafl.hpp"
+#include "game.hpp"
 
 int main(int argc, char** argv)
 {
@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 		 * Exception thrown in tafl level are fatal
 		 * Other exceptions should be handled at lower level
 		 */
-		tafl tafl(argc, argv);
+		tafl::game tafl(argc, argv);
 		return tafl();
 	}
 	catch(std::exception& e)

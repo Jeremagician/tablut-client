@@ -2,6 +2,8 @@
 #include <SDL.h>
 
 window::window(std::string title, int width, int height)
+	: width_(width)
+	, height_(height)
 {
 	int pos_x, pos_y;
 	SDL_DisplayMode screen;
