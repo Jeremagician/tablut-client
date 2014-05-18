@@ -19,6 +19,7 @@ namespace tafl
 		void update(uint32_t diff);
 		void render(void);
 		void input(void);
+		void init_gl(void);
 
 		SDL sdl{SDL_INIT_EVERYTHING}; // Will init SDL automatically
 		bool running_ = true;

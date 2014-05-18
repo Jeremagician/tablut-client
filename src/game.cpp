@@ -2,12 +2,14 @@
 #include <list>
 #include <exception>
 #include <stdexcept>
+#include <algorithm>
 #include <GL/gl.h>
 
 #include "game.hpp"
 #include "SDL.hpp"
 #include "window.hpp"
 #include "board.hpp"
+#include "texture.hpp"
 
 using namespace std;
 
@@ -16,20 +18,46 @@ tafl::game::game(int argc, char** argv)
 	, max_framerate_(80)
 {
 	list<string> args;
+	int tw = 9, th = 9;
 	for(int i = 1; i < argc; i++)
 		args.push_back(argv[i]);
 
-	window_ = new window("Tablut", 800, 600); // Can throw
-	board_ = new tafl::board(9,9); // Can trow aswell but safe
-	camera_ = new tafl::camera(vec3(0,-2,1),
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
+	window_ = new window("Tablut", 1000, 800); // Can throw
+	board_ = new tafl::board(tw,th); // Can trow aswell but safe
+	camera_ = new tafl::camera(vec3(0,-tw/3.0, max(tw, th)),
 							   vec3(0,0,0),
 							   vec3(0,0,1),
 							   static_cast<float>(window_->width())/window_->height(),
 							   60);
+	init_gl();
+}
+
+void tafl::game::init_gl(void)
+{
+	glEnable (GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_MULTISAMPLE);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST );
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST );
+	glEnable(GL_LINE_SMOOTH);
+	glEnable(GL_POLYGON_SMOOTH);
+
+
+	glEnable(GL_NORMALIZE);
+	glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	GLfloat ambient[] = {1.f, 1.f, 1.f, 1.0f};
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 }
 
 tafl::game::~game()
 {
+	delete camera_;
 	delete board_;
 	delete window_;
 }
@@ -67,7 +95,7 @@ int tafl::game::operator()()
 			speed_time = SDL_GetTicks();
 			speed_ = 1000.0/frames;
 			frames = 0;
-			cout << "MPF : " << speed_ << endl;
+			cout << "FPS : " << 1000.0/speed_ << endl;
 		}
 	}
 
@@ -98,11 +126,16 @@ void tafl::game::input(void)
 			running_ = false;
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			cout << "Click at (" << e.button.x << ", " << e.button.y << ")" << endl;
 			break;
 		case SDL_KEYUP:
 			if(e.key.keysym.sym == SDLK_ESCAPE)
 				running_ = false;
+			break;
+		case SDL_MOUSEMOTION:
+			cell c = board_->get_cell(e.motion.x, e.motion.y);
+			board_->clear_highlight();
+			if(c.is_valid())
+				board_->highlight(c.x, c.y);
 			break;
 		}
 	}
