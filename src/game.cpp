@@ -25,7 +25,7 @@ tafl::game::game(int argc, char** argv)
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
-	window_ = new window("Tablut", 1000, 800); // Can throw
+	window_ = new window("Tablut", 800, 600); // Can throw
 	board_ = new tafl::board(tw,th); // Can trow aswell but safe
 	camera_ = new tafl::camera(vec3(0,-tw/3.0, max(tw, th)),
 							   vec3(0,0,0),
