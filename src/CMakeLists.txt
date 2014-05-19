@@ -15,6 +15,7 @@ set(client_sources
 	texture.cpp texture.hpp
 	tiny_obj_loader.cpp tiny_obj_loader.hpp
 	pawn_model.cpp pawn_model.hpp
+	font.cpp font.hpp
 )
 
 add_executable(tafl-client ${client_sources})
@@ -25,4 +26,12 @@ target_link_libraries(tafl-client
   tafl-lib
   stb
 )
+
+if(UNIX)
+target_link_libraries(tafl-client
+  m
+)
+
+endif()
+
 set_target_properties(tafl-client PROPERTIES OUTPUT_NAME tafl)

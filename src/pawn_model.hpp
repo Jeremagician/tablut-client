@@ -13,6 +13,7 @@ namespace tafl
 		pawn_model(std::string path);
 		virtual ~pawn_model();
 		void render(void);
+
 	private:
 		tinyobj::shape_t shape_;
 		GLuint display_list_id_;

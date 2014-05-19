@@ -15,7 +15,7 @@ public:
 	public:
 		InitError();
 		virtual ~InitError();
-		const char* what();
+		const char* what() const noexcept;
 	private:
 		std::string msg_;
 	};

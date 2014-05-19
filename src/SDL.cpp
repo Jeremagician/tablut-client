@@ -28,7 +28,7 @@ SDL::InitError::~InitError()
 {
 
 }
-const char* SDL::InitError::what()
+const char* SDL::InitError::what() const noexcept
 {
 	return msg_.c_str();
 }

@@ -2,7 +2,7 @@
 #include <list>
 #include <exception>
 #include <stdexcept>
-#include <algorithm>
+#include <string>
 #include <GL/gl.h>
 
 #include "game.hpp"
@@ -10,11 +10,12 @@
 #include "window.hpp"
 #include "board.hpp"
 #include "texture.hpp"
+#include "utils.hpp"
 
 using namespace std;
 
 tafl::game::game(int argc, char** argv)
-	: speed_(0)
+	: speed_(-1)
 	, max_framerate_(80)
 {
 	list<string> args;
@@ -27,12 +28,22 @@ tafl::game::game(int argc, char** argv)
 
 	window_ = new window("Tablut", 800, 600); // Can throw
 	board_ = new tafl::board(tw,th); // Can trow aswell but safe
-	camera_ = new tafl::camera(vec3(0,-tw/3.0, max(tw, th)),
+	camera_ = new tafl::camera(vec3(0,-tw/3.0, utils::max(tw, th)),
 							   vec3(0,0,0),
 							   vec3(0,0,1),
 							   static_cast<float>(window_->width())/window_->height(),
 							   60);
+	font_ = new tafl::font("data/fonts/uncadis.ttf", 22.0);
+
 	init_gl();
+}
+
+tafl::game::~game()
+{
+	delete font_;
+	delete camera_;
+	delete board_;
+	delete window_;
 }
 
 void tafl::game::init_gl(void)
@@ -53,13 +64,6 @@ void tafl::game::init_gl(void)
 	glEnable(GL_LIGHT0);
 	GLfloat ambient[] = {1.f, 1.f, 1.f, 1.0f};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
-}
-
-tafl::game::~game()
-{
-	delete camera_;
-	delete board_;
-	delete window_;
 }
 
 int tafl::game::operator()()
@@ -90,12 +94,11 @@ int tafl::game::operator()()
 			sleep_time = 0;
 
 		frames++;
-		if(SDL_GetTicks() - speed_time > 1000)
+		if(SDL_GetTicks() - speed_time > 250)
 		{
 			speed_time = SDL_GetTicks();
-			speed_ = 1000.0/frames;
+			speed_ = 1000.0/(frames*4);
 			frames = 0;
-			cout << "FPS : " << 1000.0/speed_ << endl;
 		}
 	}
 
@@ -104,15 +107,72 @@ int tafl::game::operator()()
 
 void tafl::game::update(uint32_t diff)
 {
-	(void)diff;
+	board_->update(diff);
 }
 
 void tafl::game::render(void)
 {
+	glClearColor(0,0.4,0.6, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glPushMatrix();
 	camera_->render();
 	board_->render();
+	glPopMatrix();
+
+	glPushMatrix();
+	glDisable(GL_LIGHTING);
+	glDisable(GL_DEPTH_TEST);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, window_->width(), window_->height(), 0, 0, 1);
+	glMatrixMode(GL_MODELVIEW);
+	if(speed_ != -1)
+		font_->render(10,0, to_string(static_cast<int>(1000.0/speed_)) + string(" fps"));
+	font_->render(window_->width()*0.82,0,"Tafl - alpha 0.1");
+	glPopMatrix();
+
 	window_->swap();
+}
+
+void tafl::game::highlight_possible_moves(cell &c)
+{
+	if(!c.is_valid())
+		return;
+	cell temp(c);
+	board_->highlight(temp.x, temp.y, 0, 1, 0);
+	for(temp = c, temp.x++; temp.is_valid() && !board_->pawn_at(temp.x, temp.y); temp.x++)
+		board_->highlight(temp.x, temp.y, 0, 1, 0);
+	for(temp = c, temp.x--; temp.is_valid() && !board_->pawn_at(temp.x, temp.y); temp.x--)
+		board_->highlight(temp.x, temp.y, 0, 1, 0);
+	for(temp = c, temp.y++; temp.is_valid() && !board_->pawn_at(temp.x, temp.y); temp.y++)
+		board_->highlight(temp.x, temp.y, 0, 1, 0);
+	for(temp = c, temp.y--; temp.is_valid() && !board_->pawn_at(temp.x, temp.y); temp.y--)
+		board_->highlight(temp.x, temp.y, 0, 1, 0);
+}
+
+bool tafl::game::is_possible_move(cell &from, cell &to)
+{
+	if(!from.is_valid() || !to.is_valid())
+		return false;
+	cell temp(from);
+	if(from == to)
+		return true;
+	for(temp = from, temp.x++; temp.is_valid() && !board_->pawn_at(temp.x, temp.y); temp.x++)
+		if(temp == to)
+			return true;
+	for(temp = from, temp.x--; temp.is_valid() && !board_->pawn_at(temp.x, temp.y); temp.x--)
+		if(temp == to)
+			return true;
+	for(temp = from, temp.y++; temp.is_valid() && !board_->pawn_at(temp.x, temp.y); temp.y++)
+		if(temp == to)
+			return true;
+	for(temp = from, temp.y--; temp.is_valid() && !board_->pawn_at(temp.x, temp.y); temp.y--)
+		if(temp == to)
+			return true;
+	return false;
 }
 
 void tafl::game::input(void)
@@ -126,17 +186,60 @@ void tafl::game::input(void)
 			running_ = false;
 			break;
 		case SDL_MOUSEBUTTONDOWN:
+			on_mouse_down(e.button.x, e.button.y);
+			break;
+		case SDL_MOUSEBUTTONUP:
 			break;
 		case SDL_KEYUP:
 			if(e.key.keysym.sym == SDLK_ESCAPE)
 				running_ = false;
 			break;
 		case SDL_MOUSEMOTION:
-			cell c = board_->get_cell(e.motion.x, e.motion.y);
-			board_->clear_highlight();
-			if(c.is_valid())
-				board_->highlight(c.x, c.y);
+		    on_mouse_move(e.motion.x, e.motion.y);
 			break;
 		}
+	}
+}
+
+void tafl::game::on_mouse_down(int x, int y)
+{
+	cell c = board_->get_cell(x, y);
+	if(c.is_valid())
+	{
+		if(selected_.is_valid() && is_possible_move(selected_, c))
+		{
+			board_->pawn_move(selected_.x, selected_.y, c.x, c.y);
+			selected_.x = -1;
+			selected_.y = -1;
+		}
+		else
+			selected_ = c;
+		board_->clear_highlight();
+		if(board_->pawn_at(c.x, c.y))
+			highlight_possible_moves(c);
+		board_->highlight(c.x, c.y);
+	}
+}
+void tafl::game::on_mouse_move(int x, int y)
+{
+	cell c = board_->get_cell(x, y);
+	board_->clear_highlight();
+	if(selected_.is_valid() && board_->pawn_at(selected_.x, selected_.y))
+	{
+		highlight_possible_moves(selected_);
+	}
+	if(c.is_valid())
+	{
+		if(!selected_.is_valid() && board_->pawn_at(c.x, c.y))
+		{
+			highlight_possible_moves(c);
+		}
+		else
+			if(selected_.is_valid()
+			   && board_->pawn_at(selected_.x, selected_.y)
+			   && !is_possible_move(selected_, c))
+				board_->highlight(c.x, c.y, 1, 0, 0);
+			else
+				board_->highlight(c.x, c.y);
 	}
 }

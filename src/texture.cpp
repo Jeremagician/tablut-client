@@ -12,8 +12,9 @@ tafl::texture::texture(std::string filename, filtering filter, wrapping wrap)
 	if(data == NULL)
 		throw runtime_error("Can't load texture : " + filename);
 
+	glEnable(GL_TEXTURE_2D);
 	glGenTextures(1, &id_);
-	glBindTexture(1, id_);
+	glBindTexture(GL_TEXTURE_2D, id_);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
@@ -27,7 +28,7 @@ tafl::texture::texture(std::string filename, filtering filter, wrapping wrap)
 
 void tafl::texture::bind(void)
 {
-	glBindTexture(1, id_);
+	glBindTexture(GL_TEXTURE_2D, id_);
 }
 
 tafl::texture::~texture()
