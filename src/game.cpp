@@ -15,7 +15,8 @@
 using namespace std;
 
 tafl::game::game(int argc, char** argv)
-	: speed_(-1)
+	: moving_camera_(false)
+	, speed_(-1)
 	, max_framerate_(80)
 {
 	list<string> args;
@@ -28,14 +29,26 @@ tafl::game::game(int argc, char** argv)
 
 	window_ = new window("Tablut", 800, 600); // Can throw
 	board_ = new tafl::board(tw,th); // Can trow aswell but safe
-	camera_ = new tafl::camera(vec3(0,-tw/3.0, utils::max(tw, th)),
+	camera_ = new tafl::centered_camera(vec3(0,0,0), utils::max(tw, th),
+										utils::deg_to_rad(65), 0,
+										vec3(0,0,1),
+										60,
+										static_cast<float>(window_->width())/window_->height());
+
+/*	camera_ = new tafl::camera(vec3(0,-tw/3.0, utils::max(tw, th)),
 							   vec3(0,0,0),
 							   vec3(0,0,1),
-							   static_cast<float>(window_->width())/window_->height(),
-							   60);
+							   60,
+							   static_cast<float>(window_->width())/window_->height()
+							   );*/
 	font_ = new tafl::font("data/fonts/uncadis.ttf", 22.0);
 
 	init_gl();
+
+	if(!net.open("localhost", "31415"))
+	{
+		cerr << "Can't open network" << endl;
+	}
 }
 
 tafl::game::~game()
@@ -186,42 +199,57 @@ void tafl::game::input(void)
 			running_ = false;
 			break;
 		case SDL_MOUSEBUTTONDOWN:
-			on_mouse_down(e.button.x, e.button.y);
+			if(e.button.button == SDL_BUTTON_RIGHT)
+				moving_camera_ = true;
+			else
+				on_mouse_down(e.button.button, e.button.x, e.button.y);
 			break;
 		case SDL_MOUSEBUTTONUP:
+			if(e.button.button == SDL_BUTTON_RIGHT)
+				moving_camera_ = false;
 			break;
 		case SDL_KEYUP:
 			if(e.key.keysym.sym == SDLK_ESCAPE)
 				running_ = false;
+			else if(e.key.keysym.sym == SDLK_SPACE)
+				camera_->home();
 			break;
 		case SDL_MOUSEMOTION:
-		    on_mouse_move(e.motion.x, e.motion.y);
+			if(moving_camera_)
+				dynamic_cast<centered_camera*>(camera_)->move(utils::deg_to_rad(e.motion.yrel)*0.5,
+															  utils::deg_to_rad(e.motion.xrel)*0.5);
+			else
+				on_mouse_move(e.motion.x, e.motion.y);
 			break;
 		}
 	}
 }
 
-void tafl::game::on_mouse_down(int x, int y)
+void tafl::game::on_mouse_down(int button, int x, int y)
 {
-	cell c = board_->get_cell(x, y);
-	if(c.is_valid())
+	if(button == SDL_BUTTON_LEFT)
 	{
-		if(selected_.is_valid() && is_possible_move(selected_, c))
+		cell c = board_->get_cell(x, y);
+		if(c.is_valid())
 		{
-			board_->pawn_move(selected_.x, selected_.y, c.x, c.y);
-			selected_.x = -1;
-			selected_.y = -1;
+			if(selected_.is_valid() && is_possible_move(selected_, c))
+			{
+				board_->pawn_move(selected_.x, selected_.y, c.x, c.y);
+				selected_.x = -1;
+				selected_.y = -1;
+			}
+			else
+				selected_ = c;
+			board_->clear_highlight();
+			if(board_->pawn_at(c.x, c.y))
+				highlight_possible_moves(c);
+			board_->highlight(c.x, c.y);
 		}
-		else
-			selected_ = c;
-		board_->clear_highlight();
-		if(board_->pawn_at(c.x, c.y))
-			highlight_possible_moves(c);
-		board_->highlight(c.x, c.y);
 	}
 }
 void tafl::game::on_mouse_move(int x, int y)
 {
+
 	cell c = board_->get_cell(x, y);
 	board_->clear_highlight();
 	if(selected_.is_valid() && board_->pawn_at(selected_.x, selected_.y))

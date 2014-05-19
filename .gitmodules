@@ -1,3 +1,3 @@
-[submodule "dep/tafl-lib"]
-	path = dep/tafl-lib
+[submodule "src/tafl-lib"]
+	path = src/tafl-lib
 	url = git@jeretim.com:tafl-lib.git

@@ -1,8 +1,14 @@
+add_subdirectory(tafl-lib)
+
 include_directories(
   ${SDL2_INCLUDE_DIR}
   ${OPENGL_INCLUDE_DIR}
-  ${tafl-lib_SOURCE_DIR}
   ${stb_SOURCE_DIR}
+)
+
+set(tafl_lib_sources
+  tafl-lib/packet.c tafl-lib/packet.h
+  tafl-lib/struct_io.c tafl-lib/struct_io.h
 )
 
 set(client_sources
@@ -16,22 +22,19 @@ set(client_sources
 	tiny_obj_loader.cpp tiny_obj_loader.hpp
 	pawn_model.cpp pawn_model.hpp
 	font.cpp font.hpp
+	network_manager.cpp network_manager.hpp
 )
 
-add_executable(tafl-client ${client_sources})
+add_executable(tafl-client ${client_sources} ${tafl_lib_sources})
 target_link_libraries(tafl-client
   ${SDL2_LIBRARY}
   ${OPENGL_gl_LIBRARY}
   ${OPENGL_glu_LIBRARY}
-  tafl-lib
   stb
 )
 
 if(UNIX)
-target_link_libraries(tafl-client
-  m
-)
-
+target_link_libraries(tafl-client m)
 endif()
 
 set_target_properties(tafl-client PROPERTIES OUTPUT_NAME tafl)

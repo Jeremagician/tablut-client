@@ -6,6 +6,7 @@
 #include "board.hpp"
 #include "camera.hpp"
 #include "font.hpp"
+#include "network_manager.hpp"
 #include <cstdint>
 
 namespace tafl
@@ -24,8 +25,9 @@ namespace tafl
 		void highlight_possible_moves(cell &c);
 		bool is_possible_move(cell &from, cell &to);
 
-		void on_mouse_down(int x, int y);
+		void on_mouse_down(int button, int x, int y);
 		void on_mouse_move(int x, int y);
+		bool moving_camera_;
 
 		SDL sdl{SDL_INIT_EVERYTHING}; // Will init SDL automatically
 		tafl::font *font_;
@@ -36,6 +38,7 @@ namespace tafl
 		camera *camera_;
 		unsigned max_framerate_;
 		cell selected_;
+		network::network_manager net;
 	};
 }
 

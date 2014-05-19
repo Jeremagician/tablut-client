@@ -9,7 +9,6 @@ namespace tafl
 	class texture
 	{
 	public:
-
 		enum filtering
 		{
 			LINEAR = GL_LINEAR,

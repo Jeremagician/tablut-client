@@ -38,6 +38,11 @@ namespace tafl
 			alpha = alpha*alpha*alpha*(alpha*(alpha*6 - 15) + 10);
 			return lerp(start, end, alpha);
 		}
+
+		constexpr float deg_to_rad(float deg)
+		{
+			return deg * 0.0174532925;
+		}
 	}
 }
 

@@ -120,6 +120,14 @@ void tafl::board::draw_board(void)
 	glTexCoord2f(width_, height_); glVertex3f(width_,height_,0);
 	glTexCoord2f(0, height_);      glVertex3f(0,height_,0);
 	glEnd();
+
+	glBegin(GL_QUADS);
+	glTexCoord2f(0,0);             glVertex3f(0,0,0);
+	glTexCoord2f(width_,0);        glVertex3f(width_,0,0);
+	glTexCoord2f(width_, height_); glVertex3f(width_,height_,0);
+	glTexCoord2f(0, height_);      glVertex3f(0,height_,0);
+	glEnd();
+
 	glDisable(GL_TEXTURE_2D);
 }
 
@@ -231,7 +239,7 @@ void tafl::board::pawn::render(void)
 	if(model != nullptr)
 	{
 		glPushMatrix();
-		glTranslatef(real_x, real_y, 0);
+		glTranslatef(real_x, real_y, 0.02);
 		model->render();
 		glPopMatrix();
 	}
