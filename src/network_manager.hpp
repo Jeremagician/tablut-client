@@ -28,6 +28,7 @@ namespace tafl
 			virtual ~network_manager();
 			bool open(std::string host, std::string port);
 			void start(void);
+			void send_move(int sx, int sy, int dx, int dy);
 		private:
 			void run(void);
 			bool is_open_;

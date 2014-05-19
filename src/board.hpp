@@ -45,6 +45,7 @@ namespace tafl
 			KING
 		};
 
+		pawn_type pawn_get(int x, int y);
 		bool pawn_at(int x, int y);
 		void pawn_add(int x, int y, pawn_type type);
 		void pawn_remove(int x, int y);
@@ -89,8 +90,9 @@ namespace tafl
 		float real_x, real_y; // Used for animation
 		float start_x, start_y; // Used for animation
 		float percent;
-		pawn_model *model;
-		pawn(int x, int y, pawn_model *model);
+		tafl::board* board;
+		pawn_type type;
+		pawn(int x, int y, pawn_type type, tafl::board* b);
 		void move_to(int x, int y);
 		void update(uint32_t diff);
 		void render(void);

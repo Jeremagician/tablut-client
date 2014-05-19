@@ -1,5 +1,6 @@
 #include <iostream>
 #include <SDL.h>
+#include <stdexcept>
 #include <cmath>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -33,45 +34,6 @@ tafl::board::board(int width, int height)
 		delete[] cells_;
 		throw;
 	}
-
-
-	// King
-	pawns_.push_back(pawn(4,4,models_[KING]));
-
-	// Swedish
-	pawns_.push_back(pawn(5,4,models_[SWEDISH]));
-	pawns_.push_back(pawn(6,4,models_[SWEDISH]));
-
-	pawns_.push_back(pawn(3,4,models_[SWEDISH]));
-	pawns_.push_back(pawn(2,4,models_[SWEDISH]));
-
-	pawns_.push_back(pawn(4,5,models_[SWEDISH]));
-	pawns_.push_back(pawn(4,6,models_[SWEDISH]));
-
-	pawns_.push_back(pawn(4,3,models_[SWEDISH]));
-	pawns_.push_back(pawn(4,2,models_[SWEDISH]));
-
-	// Muscovites
-	pawns_.push_back(pawn(3,0,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(4,0,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(4,1,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(5,0,models_[MUSCOVITE]));
-
-	pawns_.push_back(pawn(0,3,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(0,4,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(1,4,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(0,5,models_[MUSCOVITE]));
-
-	pawns_.push_back(pawn(8,3,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(8,4,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(7,4,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(8,5,models_[MUSCOVITE]));
-
-	pawns_.push_back(pawn(3,8,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(4,8,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(4,7,models_[MUSCOVITE]));
-	pawns_.push_back(pawn(5,8,models_[MUSCOVITE]));
-
 }
 
 tafl::board::~board()
@@ -153,6 +115,14 @@ void tafl::board::draw_highlight(int x, int y)
 	glPopMatrix();
 }
 
+tafl::board::pawn_type tafl::board::pawn_get(int x, int y)
+{
+	for(pawn &p : pawns_)
+		if(p.x == x && p.y == y)
+			return p.type;
+	throw logic_error("No pawn at " + to_string(x) + ", " + to_string(y));
+}
+
 bool tafl::board::pawn_at(int x, int y)
 {
 	for(pawn &p : pawns_)
@@ -164,7 +134,7 @@ bool tafl::board::pawn_at(int x, int y)
 void tafl::board::pawn_add(int x, int y, pawn_type type)
 {
 	if(!pawn_at(x,y))
-		pawns_.push_back(pawn(x,y,models_[type]));
+		pawns_.push_back(pawn(x,y,type, this));
 }
 
 void tafl::board::pawn_remove(int x, int y)
@@ -245,20 +215,21 @@ void tafl::board::pawn::update(uint32_t diff)
 
 void tafl::board::pawn::render(void)
 {
-	if(model != nullptr)
+	if(board->models_[type] != nullptr)
 	{
 		glPushMatrix();
 		glTranslatef(real_x, real_y, 0.02);
-		model->render();
+		board->models_[type]->render();
 		glPopMatrix();
 	}
 }
 
-tafl::board::pawn:: pawn(int x, int y, pawn_model *model)
+tafl::board::pawn:: pawn(int x, int y, pawn_type type, tafl::board* b)
 	: x(x), y(y)
 	, real_x(x), real_y(y)
 	, percent(0)
-	, model(model)
+	, board(b)
+	, type(type)
 {
 }
 
