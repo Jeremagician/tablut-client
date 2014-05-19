@@ -54,50 +54,7 @@ void tafl::network::network_manager::send_move(int sx, int sy, int dx, int dy)
 
 void tafl::network::network_manager::run(void)
 {
-	bool flag = true;
-	while(game_->running_)
-	{
-		struct packet p;
-		struct_io_read_packet_header(&p.header, sfd_);
-		struct_io_read_game_state(&p.data.game_state, sfd_);
-
-		for(int i = 0; i < p.data.game_state.move_count; i++)
-		{
-			if(p.data.game_state.moves[i].type == 0)
-			{
-				game_->board_->pawn_add(p.data.game_state.moves[i].from.x,
-										p.data.game_state.moves[i].from.y,
-										static_cast<board::pawn_type>(p.data.game_state.moves[i].to.x));
-			}
-			else if(p.data.game_state.moves[i].type == 1)
-			{
-				game_->board_->pawn_remove(p.data.game_state.moves[i].from.x,
-										p.data.game_state.moves[i].from.y);
-			}
-			else if(p.data.game_state.moves[i].type == 2)
-			{
-				game_->board_->pawn_move(p.data.game_state.moves[i].from.x,
-										 p.data.game_state.moves[i].from.y,
-										 p.data.game_state.moves[i].to.x,
-										 p.data.game_state.moves[i].to.y);
-			}
-		}
-
-		if(flag)
-		{
-			flag = !flag;
-			if(p.data.game_state.state == 0)
-				game_->team_ = game::MUSCOVITE;
-			else
-				game_->team_ = game::SWEDISH;
-		}
-
-		game_->should_play_ = p.data.game_state.state == 0;
-	}
-	mutex mtx;
-	mtx.lock();
-	game_->running_ = false;
-	mtx.unlock();
+	
 }
 
 void tafl::network::network_manager::start(void)

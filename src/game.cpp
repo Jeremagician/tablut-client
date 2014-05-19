@@ -24,11 +24,6 @@ tafl::game::game(int argc, char** argv)
 	for(int i = 1; i < argc; i++)
 		args.push_back(argv[i]);
 
-	if(args.size() != 2)
-	{
-		throw runtime_error("Usage : " +string(argv[0]) + " host port");
-	}
-
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
@@ -40,21 +35,9 @@ tafl::game::game(int argc, char** argv)
 										60,
 										static_cast<float>(window_->width())/window_->height());
 
-/*	camera_ = new tafl::camera(vec3(0,-tw/3.0, utils::max(tw, th)),
-							   vec3(0,0,0),
-							   vec3(0,0,1),
-							   60,
-							   static_cast<float>(window_->width())/window_->height()
-							   );*/
 	font_ = new tafl::font("data/fonts/uncadis.ttf", 22.0);
 
 	init_gl();
-
-	if(!net.open(args[0], args[1]))
-	{
-		throw runtime_error("Can't connect to server (" + args[0] +":"+args[1]+")");
-	}
-	net.start();
 }
 
 tafl::game::~game()
@@ -152,12 +135,6 @@ void tafl::game::render(void)
 	if(speed_ != -1)
 		font_->render(10,0, to_string(static_cast<int>(1000.0/speed_)) + string(" fps"));
 	font_->render(window_->width()*0.82,0,"Tafl[Tablut] - alpha 0.1");
-	string team = (team_ == MUSCOVITE) ? "Muscovites" : "Swedish";
-	string opp = (team_ == MUSCOVITE) ? "Swedish" : "Muscovites";
-	if(should_play_)
-		font_->render(0,window_->height()-32,"You["+team+"] play");
-	else
-		font_->render(0,window_->height()-32,"Your opponent["+opp+"] play");
 	glPopMatrix();
 
 	window_->swap();
@@ -240,41 +217,27 @@ void tafl::game::input(void)
 
 void tafl::game::on_mouse_down(int button, int x, int y)
 {
-	if(should_play_)
+	if(button == SDL_BUTTON_LEFT)
 	{
-		if(button == SDL_BUTTON_LEFT)
+		cell c = board_->get_cell(x, y);
+		if(c.is_valid())
 		{
-			cell c = board_->get_cell(x, y);
-			if(c.is_valid())
+			if(selected_.is_valid() && is_possible_move(selected_, c)
+			   && !(selected_ == c))
 			{
-				if(selected_.is_valid() && is_possible_move(selected_, c)
-				   && board_->pawn_at(selected_.x, selected_.y)
-				   && is_team(board_->pawn_get(selected_.x, selected_.y))
-				   && !(selected_ == c))
-				{
-					net.send_move(selected_.x, selected_.y, c.x, c.y);
-					selected_.x = -1;
-					selected_.y = -1;
-				}
-				else
-					selected_ = c;
-
-				board_->clear_highlight();
-				if(board_->pawn_at(c.x, c.y) && is_team(board_->pawn_get(c.x, c.y)))
-					highlight_possible_moves(c);
-				board_->highlight(c.x, c.y);
+				board_->pawn_move(selected_.x, selected_.y, c.x, c.y);
+				selected_.x = -1;
+				selected_.y = -1;
 			}
+			else
+				selected_ = c;
+
+			board_->clear_highlight();
+			if(board_->pawn_at(c.x, c.y))
+				highlight_possible_moves(c);
+			board_->highlight(c.x, c.y);
 		}
 	}
-}
-
-bool tafl::game::is_team(board::pawn_type type)
-{
-	if(team_ == game::MUSCOVITE && type == board::MUSCOVITE)
-		return true;
-	else if(team_ == game::SWEDISH && (type == board::SWEDISH || type == board::KING))
-		return true;
-	return false;
 }
 
 void tafl::game::on_mouse_move(int x, int y)
@@ -282,14 +245,13 @@ void tafl::game::on_mouse_move(int x, int y)
 
 	cell c = board_->get_cell(x, y);
 	board_->clear_highlight();
-	if(selected_.is_valid() && board_->pawn_at(selected_.x, selected_.y)
-	   && is_team(board_->pawn_get(selected_.x, selected_.y)))
+	if(selected_.is_valid() && board_->pawn_at(selected_.x, selected_.y))
 	{
 		highlight_possible_moves(selected_);
 	}
-	if(c.is_valid() && should_play_)
+	if(c.is_valid())
 	{
-		if(!selected_.is_valid() && should_play_ && board_->pawn_at(c.x, c.y) && is_team(board_->pawn_get(c.x, c.y)))
+		if(!selected_.is_valid())
 		{
 			highlight_possible_moves(c);
 		}
@@ -299,17 +261,6 @@ void tafl::game::on_mouse_move(int x, int y)
 			   && !is_possible_move(selected_, c))
 				board_->highlight(c.x, c.y, 1, 0, 0);
 			else
-			{
-				if(board_->pawn_at(selected_.x, selected_.y))
-				{
-
-					if(is_team(board_->pawn_get(selected_.x, selected_.y)))
-						board_->highlight(c.x, c.y);
-					else
-						board_->highlight(c.x, c.y, 1, 0, 0);
-				}
-				else
-					board_->highlight(c.x, c.y, 1, 0, 0);
-			}
+				board_->highlight(c.x, c.y);
 	}
 }

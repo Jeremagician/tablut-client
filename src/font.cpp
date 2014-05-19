@@ -39,6 +39,7 @@ tafl::font::~font()
 
 void tafl::font::render(float x, float y, std::string text)
 {
+	glPushMatrix();
 	y = y+size_;
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex_id_);
@@ -54,6 +55,6 @@ void tafl::font::render(float x, float y, std::string text)
 			glTexCoord2f(q.s1,q.t1); glVertex2f(q.x1,q.y1);
 			glTexCoord2f(q.s0,q.t1); glVertex2f(q.x0,q.y1);
 		}
-
 	glEnd();
+	glPopMatrix();
 }
