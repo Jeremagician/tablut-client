@@ -9,6 +9,8 @@
 
 using namespace std;
 
+#define OVER_POS 0.03
+
 tafl::board::board(int width, int height)
 	: width_(width)
 	, height_(height)
@@ -31,6 +33,7 @@ tafl::board::board(int width, int height)
 		delete[] cells_;
 		throw;
 	}
+
 
 	// King
 	pawns_.push_back(pawn(4,4,models_[KING]));
@@ -120,15 +123,21 @@ void tafl::board::draw_board(void)
 	glTexCoord2f(width_, height_); glVertex3f(width_,height_,0);
 	glTexCoord2f(0, height_);      glVertex3f(0,height_,0);
 	glEnd();
-
-	glBegin(GL_QUADS);
-	glTexCoord2f(0,0);             glVertex3f(0,0,0);
-	glTexCoord2f(width_,0);        glVertex3f(width_,0,0);
-	glTexCoord2f(width_, height_); glVertex3f(width_,height_,0);
-	glTexCoord2f(0, height_);      glVertex3f(0,height_,0);
-	glEnd();
-
 	glDisable(GL_TEXTURE_2D);
+
+	glColor3f(0.02,0.02,0.02); // Switch to black
+	glBegin(GL_LINES);
+	for(unsigned i = 0; i <= width_; i++)
+	{
+		glVertex3f(i, 0, OVER_POS);
+		glVertex3f(i, height_, OVER_POS);
+	}
+	for(unsigned i = 0; i <= height_; i++)
+	{
+		glVertex3f(0, i, OVER_POS);
+		glVertex3f(width_, i, OVER_POS);
+	}
+	glEnd();
 }
 
 void tafl::board::draw_highlight(int x, int y)
@@ -136,10 +145,10 @@ void tafl::board::draw_highlight(int x, int y)
 	glPushMatrix();
 	glColor4f(cells_[y][x].r, cells_[y][x].g, cells_[y][x].b, 0.2);
 	glBegin(GL_QUADS);
-	glVertex3f(x,y,0.025);
-	glVertex3f(x+1,y,0.025);
-	glVertex3f(x+1,y+1,0.025);
-	glVertex3f(x,y+1,0.025);
+	glVertex3f(x,y,OVER_POS);
+	glVertex3f(x+1,y,OVER_POS);
+	glVertex3f(x+1,y+1,OVER_POS);
+	glVertex3f(x,y+1,OVER_POS);
 	glEnd();
 	glPopMatrix();
 }

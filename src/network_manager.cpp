@@ -1,4 +1,3 @@
-#include "network_manager.hpp"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -6,10 +5,14 @@
 #include <iostream>
 #include <cstring>
 
+#include "network_manager.hpp"
+#include "game.hpp"
 using namespace std;
 
-tafl::network::network_manager::network_manager()
+tafl::network::network_manager::network_manager(game* game)
 	: is_open_(false)
+	, game_(game)
+	, thread_(nullptr)
 {
 
 }
@@ -18,6 +21,27 @@ tafl::network::network_manager::~network_manager()
 {
 	if(is_open_)
 		close(sfd_);
+	if(thread_ != nullptr)
+	{
+		/*
+		  MEMORY LEAK MUHAHAHAHA
+		thread_->join();
+		delete thread_;
+		*/
+	}
+}
+
+void tafl::network::network_manager::run(void)
+{
+	while(game_->running_)
+	{
+
+	}
+}
+
+void tafl::network::network_manager::start(void)
+{
+	thread_ = new thread(&network_manager::run, this);
 }
 
 bool tafl::network::network_manager::open(std::string host, std::string port)

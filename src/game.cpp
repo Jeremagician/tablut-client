@@ -1,5 +1,5 @@
 #include <iostream>
-#include <list>
+#include <vector>
 #include <exception>
 #include <stdexcept>
 #include <string>
@@ -19,15 +19,20 @@ tafl::game::game(int argc, char** argv)
 	, speed_(-1)
 	, max_framerate_(80)
 {
-	list<string> args;
+	vector<string> args;
 	int tw = 9, th = 9;
 	for(int i = 1; i < argc; i++)
 		args.push_back(argv[i]);
 
+	if(args.size() != 2)
+	{
+		throw runtime_error("Usage : " +string(argv[0]) + " host port");
+	}
+
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
-	window_ = new window("Tablut", 800, 600); // Can throw
+	window_ = new window("Tafl[Tablut]", 1100, 700); // Can throw
 	board_ = new tafl::board(tw,th); // Can trow aswell but safe
 	camera_ = new tafl::centered_camera(vec3(0,0,0), utils::max(tw, th),
 										utils::deg_to_rad(65), 0,
@@ -45,10 +50,11 @@ tafl::game::game(int argc, char** argv)
 
 	init_gl();
 
-	if(!net.open("localhost", "31415"))
+	if(!net.open(args[0], args[1]))
 	{
-		cerr << "Can't open network" << endl;
+		//throw runtime_error("Can't connect to server (" + args[0] +":"+args[1]+")");
 	}
+	net.start();
 }
 
 tafl::game::~game()
@@ -132,6 +138,7 @@ void tafl::game::render(void)
 	glEnable(GL_DEPTH_TEST);
 	glPushMatrix();
 	camera_->render();
+	glTranslatef(0.0,-0.5,0.0);
 	board_->render();
 	glPopMatrix();
 
@@ -144,7 +151,7 @@ void tafl::game::render(void)
 	glMatrixMode(GL_MODELVIEW);
 	if(speed_ != -1)
 		font_->render(10,0, to_string(static_cast<int>(1000.0/speed_)) + string(" fps"));
-	font_->render(window_->width()*0.82,0,"Tafl - alpha 0.1");
+	font_->render(window_->width()*0.82,0,"Tafl[Tablut] - alpha 0.1");
 	glPopMatrix();
 
 	window_->swap();
@@ -247,6 +254,8 @@ void tafl::game::on_mouse_down(int button, int x, int y)
 		}
 	}
 }
+
+
 void tafl::game::on_mouse_move(int x, int y)
 {
 

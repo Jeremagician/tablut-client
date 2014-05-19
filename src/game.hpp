@@ -13,6 +13,7 @@ namespace tafl
 {
 	class game
 	{
+		friend class network::network_manager;
 	public:
 		game(int argc, char** argv);
 		virtual ~game(void);
@@ -38,7 +39,7 @@ namespace tafl
 		camera *camera_;
 		unsigned max_framerate_;
 		cell selected_;
-		network::network_manager net;
+		network::network_manager net{this};
 	};
 }
 

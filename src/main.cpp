@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	}
 	catch(std::exception& e)
 	{
-		std::cerr << "An error occured : " << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "An error occured", e.what(), NULL);
 	}
 	return -1;

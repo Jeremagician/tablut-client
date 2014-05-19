@@ -88,7 +88,7 @@ void tafl::centered_camera::move(float vertical_angle_diff, float horizontal_ang
 	vertical_angle_ += vertical_angle_diff;
 	horizontal_angle_ += horizontal_angle_diff;
 
-	vertical_angle_ = utils::clamp(vertical_angle_, -vertical_bounds, vertical_bounds);
+	vertical_angle_ = utils::clamp(vertical_angle_, 0.f, vertical_bounds);
 	horizontal_angle_ = utils::clamp(horizontal_angle_, -horizontal_bounds, horizontal_bounds);
 
 	pos_ = vec3(sin(horizontal_angle_)*cos(vertical_angle_)*radius_,

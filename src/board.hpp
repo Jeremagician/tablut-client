@@ -40,7 +40,7 @@ namespace tafl
 		/* temporary */
 		enum pawn_type
 		{
-			MUSCOVITE,
+			MUSCOVITE = 0,
 			SWEDISH,
 			KING
 		};
