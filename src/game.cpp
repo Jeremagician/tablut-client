@@ -66,6 +66,7 @@ void tafl::game::init_gl(void)
 	glEnable(GL_LIGHT0);
 	GLfloat ambient[] = {1.f, 1.f, 1.f, 1.0f};
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
+	glClearColor(0,0.4,0.6, 1.0);
 }
 
 int tafl::game::operator()()
@@ -114,7 +115,6 @@ void tafl::game::update(uint32_t diff)
 
 void tafl::game::render(void)
 {
-	glClearColor(0,0.4,0.6, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glEnable(GL_LIGHTING);

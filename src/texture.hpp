@@ -11,8 +11,8 @@ namespace tafl
 	public:
 		enum filtering
 		{
-			LINEAR = GL_LINEAR,
-			NEAREST = GL_NEAREST
+			LINEAR = GL_LINEAR_MIPMAP_LINEAR,
+			NEAREST = GL_NEAREST_MIPMAP_NEAREST
 		};
 
 		enum wrapping

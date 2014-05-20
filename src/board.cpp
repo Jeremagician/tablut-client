@@ -34,6 +34,43 @@ tafl::board::board(int width, int height)
 		delete[] cells_;
 		throw;
 	}
+
+	// King
+	pawns_.push_back(pawn(4,4,KING,this));
+
+	// Swedish
+	pawns_.push_back(pawn(5,4,SWEDISH,this));
+	pawns_.push_back(pawn(6,4,SWEDISH,this));
+
+	pawns_.push_back(pawn(3,4,SWEDISH,this));
+	pawns_.push_back(pawn(2,4,SWEDISH,this));
+
+	pawns_.push_back(pawn(4,5,SWEDISH,this));
+	pawns_.push_back(pawn(4,6,SWEDISH,this));
+
+	pawns_.push_back(pawn(4,3,SWEDISH,this));
+	pawns_.push_back(pawn(4,2,SWEDISH,this));
+
+	// Muscovites
+	pawns_.push_back(pawn(3,0,MUSCOVITE,this));
+	pawns_.push_back(pawn(4,0,MUSCOVITE,this));
+	pawns_.push_back(pawn(4,1,MUSCOVITE,this));
+	pawns_.push_back(pawn(5,0,MUSCOVITE,this));
+
+	pawns_.push_back(pawn(0,3,MUSCOVITE,this));
+	pawns_.push_back(pawn(0,4,MUSCOVITE,this));
+	pawns_.push_back(pawn(1,4,MUSCOVITE,this));
+	pawns_.push_back(pawn(0,5,MUSCOVITE,this));
+
+	pawns_.push_back(pawn(8,3,MUSCOVITE,this));
+	pawns_.push_back(pawn(8,4,MUSCOVITE,this));
+	pawns_.push_back(pawn(7,4,MUSCOVITE,this));
+	pawns_.push_back(pawn(8,5,MUSCOVITE,this));
+
+	pawns_.push_back(pawn(3,8,MUSCOVITE,this));
+	pawns_.push_back(pawn(4,8,MUSCOVITE,this));
+	pawns_.push_back(pawn(4,7,MUSCOVITE,this));
+	pawns_.push_back(pawn(5,8,MUSCOVITE,this));
 }
 
 tafl::board::~board()
@@ -81,9 +118,9 @@ void tafl::board::draw_board(void)
 	/* Draw game area */
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,0);             glVertex3f(0,0,0);
-	glTexCoord2f(width_,0);        glVertex3f(width_,0,0);
-	glTexCoord2f(width_, height_); glVertex3f(width_,height_,0);
-	glTexCoord2f(0, height_);      glVertex3f(0,height_,0);
+	glTexCoord2f(1,0);        glVertex3f(width_,0,0);
+	glTexCoord2f(1, 1); glVertex3f(width_,height_,0);
+	glTexCoord2f(0, 1);      glVertex3f(0,height_,0);
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 
