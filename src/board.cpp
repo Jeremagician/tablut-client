@@ -232,7 +232,7 @@ void tafl::board::update(uint32_t diff)
 
 void tafl::board::pawn::update(uint32_t diff)
 {
-	float amount = (diff / 1000.0) * 2;
+	float amount = (diff / 1000.0);
 	if(x != real_x || y != real_y)
 	{
 		// if pawn is close enough of target pos, stop the animation

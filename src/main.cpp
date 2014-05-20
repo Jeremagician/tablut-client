@@ -1,6 +1,7 @@
 #include <exception>
 #include <iostream>
 #include <SDL.h>
+#include <GL/gl.h>
 #include "game.hpp"
 
 int main(int argc, char** argv)

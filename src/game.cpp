@@ -35,7 +35,7 @@ tafl::game::game(int argc, char** argv)
 										60,
 										static_cast<float>(window_->width())/window_->height());
 
-	font_ = new tafl::font("data/fonts/uncadis.ttf", 22.0);
+	font_ = new tafl::font("data/fonts/dum1.ttf", 28.0);
 
 	init_gl();
 }
@@ -134,7 +134,7 @@ void tafl::game::render(void)
 	glMatrixMode(GL_MODELVIEW);
 	if(speed_ != -1)
 		font_->render(10,0, to_string(static_cast<int>(1000.0/speed_)) + string(" fps"));
-	font_->render(window_->width()*0.82,0,"Tafl[Tablut] - alpha 0.1");
+	font_->render(window_->width()*0.78,0,"Tafl[Tablut] - alpha 0.1");
 	glPopMatrix();
 
 	window_->swap();
