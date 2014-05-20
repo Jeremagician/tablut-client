@@ -13,18 +13,10 @@ namespace tafl
 {
 	class game
 	{
-		friend class network::network_manager;
 	public:
 		game(int argc, char** argv);
 		virtual ~game(void);
 		int operator()(void);
-
-		enum team
-		{
-			MUSCOVITE = 0,
-			SWEDISH
-		};
-
 	private:
 		void update(uint32_t diff);
 		void render(void);
@@ -46,9 +38,6 @@ namespace tafl
 		camera *camera_;
 		unsigned max_framerate_;
 		cell selected_;
-		game::team team_;
-		bool is_team(board::pawn_type type);
-		bool should_play_;
 		network::network_manager net{this};
 	};
 }
