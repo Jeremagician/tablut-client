@@ -1,3 +1,0 @@
-[submodule "src/tafl-lib"]
-	path = src/tafl-lib
-	url = git@github.com:Jeremagician/tablut-lib.git
